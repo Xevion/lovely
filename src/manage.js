@@ -16,7 +16,7 @@ class Manager {
     TIME_PERIOD = 60;
     EDGE_BUFFER = 0.15;
     MIN_RADIUS = 30;
-    TIME_SCALE = 2.3;
+    TIME_SCALE = 2.8;
 
     constructor(app, sectionCount) {
         this.app = app;
@@ -90,7 +90,7 @@ class Manager {
     generatePoint() {
         // Generation initial data on the point
         let point = random.pointInCircle(new Point(0, 0), this.MIN_RADIUS, this.MAX_RADIUS);
-        let sprite = null;
+        let sprite;
 
         // Acquire sprite object.
         if (this.sprite_trash.length < 1) {
@@ -106,8 +106,6 @@ class Manager {
         sprite.y = point.y;
 
         // Set scale
-        // let distanceFromCenter = this.getDistance(commonPositions.center, point);
-        // sprite.baselineScale = this.uniform(0.45, 0.65);
         sprite.baselineScale = random.uniform(0.05, 0.12)
         sprite.scale.set(0, 0)
 
