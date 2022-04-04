@@ -1,6 +1,9 @@
 import {Point} from "pixi.js";
 
 export default {
+    getDistanceSimple(aX, aY, bX, bY) {
+        return Math.sqrt(Math.pow(aX - bX, 2) + Math.pow(aY - bY, 2))
+    },
     getDistance(a, b) {
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
     },
@@ -32,7 +35,7 @@ export default {
     /**
      * Generates a number of sections and returns basic generation data to assist initialization of the canvas.
      * @param sectionCount The number of sections a 360 degree / 2pi area should be split up into.
-     * @returns {data} Returns an array of objects containing useful pre-generated angles & data.
+     * @returns {*[]} Returns an array of objects containing useful pre-generated angles & data.
      */
     generateSections(sectionCount) {
         let data = [];
@@ -41,7 +44,7 @@ export default {
             let startAngle = baseAngle * section;
             let endAngle = startAngle + baseAngle;
             let centerAngle = startAngle + (baseAngle / 2.0);
-            let velocityPoint = new Point(Math.cos(centerAngle), Math.sin(centerAngle));
+            let velocityPoint = new Point(-Math.cos(centerAngle), Math.sin(centerAngle));
             data.push({startAngle, centerAngle, endAngle, velocityPoint});
         }
         return data;
