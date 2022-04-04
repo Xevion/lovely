@@ -60,7 +60,7 @@ export default {
       // app.stage.addChild(centerText);
       centerText.x = 0;
 
-      const manager = new Manager(app, 8);
+      const manager = new Manager(app, 16);
       app.ticker.add(manager.tick);
     },
   },

@@ -9,12 +9,14 @@ class Manager {
     REMOVAL_BUFFER = 100 // The buffer zone for sprite removal to prevent sprites from being deleted before they are entirely out of view.
     MAX_BASELINE_SCALE = 0.65; // Maximum scaling constant for sprites.
     MAX_SPRITE_COUNT = 200; // The maximum number of sprites that should be rendered at once.
-    EASING_FUNCTION = easing.outQuint(); // The easing function that controls movement & scaling easing.
+    EASING_FUNCTION = easing.outExpo(); // The easing function that controls movement & scaling easing.
     MOTION_BLUR_KERNEL_SIZE = 3; // Controls motion blur quality.
-    MOTION_BLUR_SCALE = 8; // The maximum scale motion blur can be in either X or Y.
-    VELOCITY_SCALE = 7;
+    MOTION_BLUR_SCALE = 7; // The maximum scale motion blur can be in either X or Y.
+    VELOCITY_SCALE = 3;
+    TIME_PERIOD = 60;
     EDGE_BUFFER = 0.15;
     MIN_RADIUS = 30;
+    TIME_SCALE = 2.3;
 
     constructor(app, sectionCount) {
         this.app = app;
@@ -77,6 +79,9 @@ class Manager {
 
         // Generation Constants
         this.MAX_RADIUS = Math.min(this.app.screen.width, this.app.screen.height) * (1 - this.EDGE_BUFFER);
+
+        // Sprites that have gone out of boundary and need to be used.
+        this.sprite_trash = [];
     }
 
     /**
@@ -85,7 +90,15 @@ class Manager {
     generatePoint() {
         // Generation initial data on the point
         let point = random.pointInCircle(new Point(0, 0), this.MIN_RADIUS, this.MAX_RADIUS);
-        let sprite = new PIXI.Sprite(random.choice(this.textures));
+        let sprite = null;
+
+        // Acquire sprite object.
+        if (this.sprite_trash.length < 1) {
+            sprite = new PIXI.Sprite(random.choice(this.textures));
+        } else {
+            sprite = this.sprite_trash.shift();
+            sprite.visible = true;
+        }
 
         // Place the sprite at the point
         sprite.anchor.set(0.5, 0.5);
@@ -105,8 +118,7 @@ class Manager {
         sprite.velocityX = Math.cos(angleFromCenter) * velocity;
         sprite.velocityY = Math.sin(angleFromCenter) * velocity * -1;
 
-        // console.log({sprite.velocityX})
-        // console.log({sprite.velocityX, sprite.velocityY})
+        sprite.totalTime = 0;
 
         // Add it to the section & section list
         this.sections[sectionIndex].addChild(sprite);
@@ -131,19 +143,21 @@ class Manager {
      * @param delta The time (in seconds) that passed between now and the last tick() call.
      */
     tick = (delta) => {
+        delta *= this.TIME_SCALE;
         // Iterate through each section
         for (const [sectionIndex, section] of this.sections.entries()) {
             // Iterate through all sprites moving in that section
             for (const [spriteIndex, sprite] of this.sectionSprites[sectionIndex].entries()) {
-                let distanceScale = util.getDistanceSimple(0, 0, sprite.x, sprite.y) / this.MAX_DISTANCE;
-
+                sprite.totalTime += delta;
+                let scaleValue = sprite.totalTime / this.TIME_PERIOD;
+                // let scaleValue = util.getDistanceSimple(0, 0, sprite.x, sprite.y) / this.MAX_DISTANCE;
                 // distanceScale = Math.max(1, distanceScale + 0.3);
-                let easeValue = this.EASING_FUNCTION(distanceScale);
+                let easeValue = this.EASING_FUNCTION(scaleValue);
 
                 if (sprite.baselineScale < this.MAX_BASELINE_SCALE)
                     sprite.baselineScale = Math.min(this.MAX_BASELINE_SCALE, sprite.baselineScale + (0.1 * delta * 0.25));
 
-                let scale = sprite.baselineScale * Math.log(distanceScale + 1)
+                let scale = sprite.baselineScale * Math.log(scaleValue + 1)
                 sprite.scale.set(scale, scale);
 
                 sprite.x += sprite.velocityX * delta * easeValue;
@@ -151,10 +165,12 @@ class Manager {
 
                 // Remove sprites outside view
                 if (this.outside(sprite)) {
+                    sprite.visible = false;
+                    this.sprite_trash.push(sprite);
                     this.sectionSprites[sectionIndex].splice(spriteIndex, 1);
-                    section.removeChild(sprite);
+                    // section.removeChild(sprite);
+                    // sprite.destroy();
                     this.total_sprites--;
-                    sprite.destroy();
                 }
             }
         }
