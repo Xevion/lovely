@@ -13,8 +13,7 @@ export default {
     drawPixi: function () {
       const canvas = document.getElementById('pixi')
       const app = new PIXI.Application({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        resizeTo: window,
         antialias: true,
         backgroundColor: 0x171717,
         view: canvas,
@@ -71,7 +70,8 @@ export default {
 </script>
 
 <style>
-body {
+* {
+  overflow: hidden;
   margin: 0;
   padding: 0;
   background-color: #171717;
