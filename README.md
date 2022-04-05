@@ -1,24 +1,11 @@
 # lovely
 
-## Project setup
-```
-npm install
-```
+![Lovely Project Banner](./public/Lovely-Banner.jpg)
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+A small project I made to play around with 2d canvases, motion blur effects and trying out canvas APIs for the first time.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Setup, Development and Production
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- Setup: `npm install`
+- Development: `npm run serve`
+- Build: `npm run build`
